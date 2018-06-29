@@ -14,7 +14,14 @@ for (i in 1:6){
 }
 
 plot(sampleave)
+hoge<-function(x){y=30+x*0}
+curve(hoge,from=1,to=6,add=TRUE,col="red")
+
 plot(samplevar)
+hoge<-function(x){y=25+x*0}
+curve(hoge,from=1,to=6,add=TRUE,col="red")
+
 plot(samplevar2)
+curve(hoge,from=1,to=6,add=TRUE,col="red")
 
 #平均には一致性あり、分散には一致性あり、不偏分散には一致性あり
