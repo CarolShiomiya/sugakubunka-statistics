@@ -17,8 +17,11 @@ c(80,99,90,40,60)
 
 #ベクトルに対しての演算
 japanese<-c(60,70,50,80,80,40,60)
-japanese
+japanese*2
+japanese+100
+log(japanese,10)
 math<-c(70,20,60,80,30,80,90)
+
 
 #ベクトルの長さ
 length(japanese)
@@ -65,3 +68,42 @@ mean(z1)
 dev_z1<-mean((z1-mean(z1))^2)
 mean(z2)
 dev_z2<-mean((z2-mean(z2))^2)
+
+#複数値をテーブルのようにまとめる（data.frame関数）
+data.frame(japanese,math)
+health<-c("A","A","B","C","A","D","B")
+health<-as.character(health)
+df<-data.frame(japanese,math,health)
+df
+#ｄｆから列や行やセルを取り出す（参照する）には
+df[2,3]
+df[4,1]
+df[4,]
+df[,3]
+
+#ｄｆの行や列やセルを上書きすることもできる
+df[2,3]<-"D"
+
+math2<-c(80,50,40,60,20,60,0)
+df[,2]<-math2
+df
+
+eng<-c(30,20,50,60,10,40,60)
+df[,4]<-eng
+df[8,1]<-60
+df[8,2]<-70
+df[8,3]<-"B"
+df[8,4]<-50
+#特定の列を抜き出す
+df2<-df[,c(1,2,4)]
+df2
+
+#list関数を使えば、型が違うものをひとまとめにできる
+hoge<-list(1,2,"猫",c(10,20),data.frame(c(10,20,30),c(100,80,40)))
+hoge
+#listからの参照には[[　]]を使う
+hoge[[1]]
+hoge[[3]]
+hoge[[4]]
+hoge[[4]][1]
+hoge[[5]][1,2]
