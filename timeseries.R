@@ -9,11 +9,14 @@ cor(x1,x[1:length(x1)])
 y<-c(30,10,32,11,33,4,51,15,30)　#高低が交互に来る時系列データ
 plot(y,type="b")
 y1<-y[2:length(y)]　#１期ずらし
+plot(y1,col="RED",type="b")
+help(plot)
 y1
 plot(y1,y[1:length(y1)])
 cor(y1,y[1:length(y1)])
 
 y2<-y[3:length(y)]　#2期ずらし
+plot(y2,type="b")
 y2
 plot(y2,y[1:length(y2)])
 cor(y2,y[1:length(y2)])
@@ -24,6 +27,10 @@ t<-1:100
 z<-10*sin(2*pi*t/12)+rnorm(100,mean=0,sd=1.5)
 plot(z,type="b")
 acf(z)　#コレログラムを描く
+z12<-z[12:length(z)]　#12期ずらし
+plot(z12,z[1:length(z12)])
+pacf(z)
+help(acf)
 z1<-z[13:length(z)]
 z
 head(z1)
