@@ -4,13 +4,14 @@ x<-c(20,23,25,26,28,31,33,35,40) #単に増えていくだけの時系列デー�
 plot(x,type="b")
 x1<-x[2:length(x)] #１期ずらし
 cor(x1,x[1:length(x1)]) 
-
+acf(x)
+pacf(x)
 
 y<-c(30,10,32,11,33,4,51,15,30)　#高低が交互に来る時系列データ
 plot(y,type="b")
 y1<-y[2:length(y)]　#１期ずらし
 plot(y1,col="RED",type="b")
-help(plot)
+#help(plot)
 y1
 plot(y1,y[1:length(y1)])
 cor(y1,y[1:length(y1)])
@@ -30,7 +31,6 @@ acf(z)　#コレログラムを描く
 z12<-z[12:length(z)]　#12期ずらし
 plot(z12,z[1:length(z12)])
 pacf(z)
-help(acf)
 z1<-z[13:length(z)]
 z
 head(z1)
