@@ -37,5 +37,5 @@ binomplot<-function(p,N){
   return(prob)
   }
 
-sum(binomplot(0.01,100)[3:101])
-binomplot(0.01,10)
+sum(binomplot(1/100000,200000)[1:10])
+binomplot(0.3,100)
