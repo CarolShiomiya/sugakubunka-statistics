@@ -24,7 +24,7 @@ sum(prob) #和は１であることを確認
 
 
 #p,Nを決めれば、二項分布の確率質量関数の形が決まる。
-binomplot<-function(p,N){
+binomplot<-function(p,N,color="black"){
   #確率変数は、アタリの回数なので、0からN
   X<-0:N
   #二項係数
@@ -33,9 +33,28 @@ binomplot<-function(p,N){
   seki<-(p^X)*((1-p)^(N-X))
   #確率質量関数を求める
   prob<-bi*seki
-  plot(X,prob)
+  plot(X,prob,col=color)
   return(prob)
   }
 
 sum(binomplot(1/100000,200000)[1:10])
-binomplot(0.3,100)
+binomplot(0.1,10,"red")
+help(dpois)
+
+
+#pが小さく、nが大きい場合はポアソン分布という近似が成り立つ。
+poissonplot<-function(lamda){
+  #確率変数は、アタリの回数なので、0からNだが、今回は100までにしておく。
+  X<-0:100
+  #pポアソン分布の確率質量関数
+  prob<-((lamda^X)/gamma(X+1))*exp(-lamda)
+  plot(X,prob)
+  return(prob)
+}
+x<-poissonplot(10)
+y<-binomplot(0.5,100,"red")
+
+plot(y,xlim=c(0,100))
+
+jidou<-poissonplot(10)
+1-sum(jidou[0:19])
