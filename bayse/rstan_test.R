@@ -11,7 +11,7 @@ y
 model <- "
     data {
         int N;
-        vector[N] y;
+        vector[N] Y;
     }
     parameters { 
         real mu;
@@ -19,9 +19,20 @@ model <- "
     }
     model { 
         for (i in 1:N)
-            y[i] ~ normal(mu,sigma);
+            Y[i] ~ normal(mu,sigma);
     }
 "
+yData<-list(N=length(y),Y=y)
+library(rstan)
+fit<-stan(
+  model_code = model,
+  data=yData,
+  iter=1100,
+  warmup=100,
+  thin=1,
+  chains=3)
+fit
+
 
 localLevelModel_1<-"
   data{
