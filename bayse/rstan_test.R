@@ -1,7 +1,7 @@
 ## 1.実際に乱数を生成し、その母数を推定する
 #pythonで既知の母数を持つ正規乱数を生成し、その結果のみを用いて母数を推定してみよう。<br>
 #stanがベイズ推論した母数は、真の母数と一致するだろうか？
-
+library(rstan)
 y=rnorm(100,30,9) #期待値30、標準偏差9の正規分布に従う乱数を100個生成する
 y
 
@@ -31,8 +31,8 @@ fit<-stan(
   warmup=100,
   thin=1,
   chains=3)
-fit
-
+traceplot(fit)
+stan_hist(fit)
 
 localLevelModel_1<-"
   data{
