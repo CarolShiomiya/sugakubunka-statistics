@@ -3,7 +3,7 @@
 
 library(rstan)
 y=rexp(100,rate = 5)
-y
+hist(y)
 
 #データYを元に母数を推定してみよう。
 
@@ -35,3 +35,6 @@ fit<-stan(
 traceplot(fit)
 stan_hist(fit)
 fit
+
+
+rpois(100,0.7)
