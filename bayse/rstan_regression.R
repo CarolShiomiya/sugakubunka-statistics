@@ -23,8 +23,9 @@ parameters {
   real<lower=0> sigma;
 }
 model { 
-for (i in 1:N)
-  Y[i] ~ normal(a*X[i]+b,sigma);
+//for (i in 1:N)
+  //Y[i] ~ normal(a*X[i]+b,sigma);
+Y~normal(a*X+b,sigma);
 }"
 
 #generated quantitiesブロックで予測もできる
@@ -47,6 +48,7 @@ fit<-stan(
 traceplot(fit)
 stan_hist(fit)
 fit
+
 
 #Rの機能で線形回帰（これは古典統計的なの最小二乗法）
 reg<-lm(formula = y~x)

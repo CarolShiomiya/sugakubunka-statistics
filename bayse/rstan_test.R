@@ -4,7 +4,7 @@
 library(rstan)
 y=rnorm(100,30,9) #期待値30、標準偏差9の正規分布に従う乱数を100個生成する
 y
-
+hist(y)
 
 # Stanコード。別ファイル（.stan）にdata{から書いてもよし。
 #インデントを気にしない言語ではあるがちゃんとインデントしよう。
@@ -22,17 +22,20 @@ model <- "
             Y[i] ~ normal(mu,sigma);
     }
 "
+
 yData<-list(N=length(y),Y=y)
 library(rstan)
 fit<-stan(
   model_code = model,
   data=yData,
-  iter=1100,
+  iter=5000,
   warmup=100,
   thin=1,
   chains=3)
 traceplot(fit)
+stan_dens(fit,separate_chains = TRUE)
 stan_hist(fit)
+help("stan_hist")
 
 localLevelModel_1<-"
   data{

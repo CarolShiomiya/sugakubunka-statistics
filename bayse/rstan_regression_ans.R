@@ -5,7 +5,7 @@ library(rstan)
 
 #tree dataを読み込む。
 df<-trees
-
+df
 pairs(df)
 #Girth(直径)とHeight（高さ）からVolume（体積）を求めよう。
 
@@ -14,7 +14,7 @@ pairs(df)
 
 #data
 yData<-list(N=length(df$Volume),H=df$Height,G=df$Girth,V=df$Volume)
-
+df
 # Stanコード。別ファイル（.stan）にdata{から書いてもよし。
 #インデントを気にしない言語ではあるがちゃんとインデントしよう。
 model <- "

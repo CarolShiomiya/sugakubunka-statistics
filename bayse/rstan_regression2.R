@@ -1,7 +1,7 @@
 ## 2.重回帰をベイズ推論してみよう
 #YはXの1次関数でモデル化できるようなデータがあるとする。<br>
 #このとき、y=ax+b+εと書ける。a,b,V[ε]を推定しよう。（εは期待値0の正規分布）
-#前回の授業では、a,xは1つの実数であったが、今回は3次元の実数ベクトルとする。
+#前回の授業では、a,xは1つの実数であったが、今回は2次元の実数ベクトルとする。
 #また、今回はtransformed parametersブロックの使い方も学ぶ。
 
 #まずはデータ作成
@@ -19,7 +19,7 @@ pairs(data.frame(x1,x2,y))
 model <- "
 data {
   int N;
-  vector[N] X1;
+  real X1[N];
   vector[N] X2;
   vector[N] Y;
 }
@@ -59,6 +59,7 @@ fit<-stan(
 traceplot(fit)
 stan_hist(fit)
 stan_hist(fit,pars=c("a1","a2","b"))
+
 fit
 
 #Rの機能で線形回帰（これは古典統計的なの最小二乗法）して回帰係数を確認
@@ -84,6 +85,9 @@ for (i in 1:100){
 model <- "
 data {
   int N;
+  vector[N] X1;
+  vector[N] X2;
+  int Y[N];
       //Yの型に注意
 }
 parameters { 
@@ -97,11 +101,11 @@ transformed parameters{
 }
 model { 
   for (i in 1:N)
-  Y[i] ~ ;
+    Y[i] ~ bernoulli(p[i]);
 }"
 
 #data
-yData<-list(     )
+yData<-list()
 
 #実行
 fit<-stan(
