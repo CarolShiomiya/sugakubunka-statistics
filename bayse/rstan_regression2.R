@@ -22,6 +22,8 @@ data {
   real X1[N];
   vector[N] X2;
   vector[N] Y;
+  real New_X1[3];
+  real New_X2[3];
 }
 parameters { 
   real a1;
@@ -36,17 +38,14 @@ transformed parameters{
 }
 model { 
   for (i in 1:N)
-    Y[i] ~ normal(mu[i],sigma);
+    Y[i] ~ normal(mu[i],sigma);}
+generated quantities {
+  real yhat[3];
+  for (i in 1:3)
+    yhat[i] = normal_rng(a1*New_X1[i]+a2*New_X2[i]+b, sigma);
 }"
 
-#generated quantitiesブロックで予測もできる
-#generated quantities {
-#  real yhat[new_N];
-#  for (i in 1:new_N)
-#    yhat[i] = normal_rng(a*new_x[i]+b, sigma);
-#}
-
-yData<-list(N=length(y),X1=x1,X2=x2,Y=y)
+yData<-list(N=length(y),X1=x1,X2=x2,Y=y,New_X1=c(10,11,21),New_X2=c(10,11,21))
 #yData<-list(N=length(y),X=x,Y=y,new_N=5,new_X=c(5,10,15,20,25))
 library(rstan)
 fit<-stan(
@@ -60,7 +59,8 @@ traceplot(fit)
 stan_hist(fit)
 stan_hist(fit,pars=c("a1","a2","b"))
 
-fit
+ms=extract(fit)
+ms$yhat
 
 #Rの機能で線形回帰（これは古典統計的なの最小二乗法）して回帰係数を確認
 reg<-lm(formula = y~x1+x2)

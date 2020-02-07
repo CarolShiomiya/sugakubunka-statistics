@@ -35,7 +35,8 @@ df
 
 
 ##実際にやってみよう！
-
+library(ggplot2)
+qplot(data=df,x=kinzoku,y=taishokukin,colour=kaisha,geom="point")
 
 #太郎くん「どうやら線形性があるようですね。まずは退職金は勤続年数の1次関数に個人固有の値が足されたものとして
 #モデルを作ってみましょう。この場合、stanで母数を推定すると…」
@@ -44,8 +45,26 @@ df
 
 library(rstan)
 
-yData<-list(    ) #埋めてみよ
+yData<-list() #埋めてみよ
 model <- "
+data{
+  real Kinzoku[100];
+  real Taishoku[100];
+}
+parameters{
+  real a1;
+  real b;
+  real<lower=0> sigma;
+}
+transformed parameters{
+  real mu[100];
+  for (i in 1:100)
+    mu[i]=a1*Kinzoku[i]+b
+}
+model{
+  for (j in 1:100)
+    Taishoku[j]~normal(mu[j],sigma)
+}
 
 " #埋めてみよ
 
@@ -86,8 +105,6 @@ parameters{
   real a2;
   real b1;
   real b2;
-  
-  
 }
 
 model{
@@ -96,11 +113,12 @@ model{
   //B社分
 }
 
+kaisha<-c(rep(1,25),rep(2,25),rep(3,25),rep(4,25))
+kaisha
 
 #花子さん「できましたね。ここでx1,x2がそれぞれ正規分布から取り出されていることをmodelに付け加えれば良いのですね」
 #太郎くん「各社のそれぞれの回帰係数を4次元ベクトルにしたものを vector[4] x1;,vector[4] x2;で定義しましょう。」
 #花子さん「x1とx2が従う正規分布の母数はそれぞれmu1,sigma1,mu2,sigma2としましょう。これも書かないとですね」
-
 model<-
 "data{
   int N;
@@ -113,21 +131,38 @@ parameters{
   real mu2;
   real<lower=0> sigma1;
   real<lower=0> sigma2;
-  real x1[4];
-  real x2[4];
+  real a[4];
+  real b[4];
   real<lower=0> kojin_sigma;
 }
 model{
   for (i in 1:4)
-    x1[i]~normal(mu1,sigma1);
-    x2[i]~normal(mu2,sigma2);
+    a[i]~normal(mu1,sigma1);
+  for (i in 1:4)
+    b[i]~normal(mu2,sigma2);
   for (j in 1:N)
-    Taishokukin[j]~normal(x1[Kaisha_ID[j]]*Kinzoku[j]+x2[Kaisha_ID[j]],kojin_sigma);
+    Taishokukin[j]~normal(a[Kaisha_ID[j]]*Kinzoku[j]+b[Kaisha_ID[j]],kojin_sigma);
 }"
+
 
 #太郎くん「では、早速モデルをコンパイルして母数を推定してみましょう。」
 
-##適切な形でデータを渡してモデルを走らせてみよ。前回までの教材を参照しよう。
+##適切な形でデータを渡してMCMCを走らせてみよ。前回までの教材を参照しよう。
+kaishaid=rep(1:4,each=25)
+kaishaid
+yData=list("N"=100,"Kinzoku"=df$kinzoku,"Taishokukin"=df$taishokukin,"Kaisha_ID"=kaishaid)
+
+
+fit<-stan(
+  model_code = model,
+  data=yData,
+  iter=1100,
+  warmup=100,
+  thin=1,
+  chains=3)
+traceplot(fit)
+stan_hist(fit)
+fit
 
 
 
@@ -138,14 +173,58 @@ model{
 
 #通販サイトのユーザー1〜100がいる。ユーザーがどのような間隔でサービスを使うかを調査しよう。
 #それぞれのユーザーの購入間隔は、ユーザー固有の母数λ（ユーザー）を持つ指数分布に従うというモデルを考える。
-#λはND(mu,sigma^2)に従うとする。
+#λはgamma(2,0.5)に従うとする。
 
 #問1　この仮定に従うデータを作成せよ。
 #Y 購入間隔。各ユーザーにつき10件、合計1000件。
 #X ユーザーid。1,2,3...100がそれぞれ10回ずつ繰り返される。
 #これらが実際に観測されるデータである。
 
+lamda=rgamma(100,2,0.5)
+kankaku=c()
+userid=c()
+for (user in 1:100){
+  kankaku=c(kankaku,rexp(10,lamda[user]))
+  userid=c(userid,rep(user,10))
+}
+rep(1:10,each=10)
+lamdahat<-c()
+
+library(dplyr)
+df <- group_by(, Species)
+
 #問2　母数を推定し、1で使用した母数と一致しているかを確認しよう。
+model<-"
+data{
+  real Kankaku[1000];
+  int Userid[1000];
+}
+parameters{
+  real <lower=0> alpha;
+  real <lower=0> beta;
+}
+model{
+  real lamda[100];
+  for (i in 1:100)
+    lamda[i]~gamma(alpha,beta);
+  for(j in 1:1000)
+    Kankaku[j]~exponential(lamda[Userid[j]]);
+}"
+yData<-list("Kankaku"=kankaku,"Userid"=userid) #埋めてみよ
+library(rstan)
+fit<-stan(
+  model_code = model,
+  data=yData,
+  iter=1100,
+  warmup=100,
+  thin=1,
+  chains=3)
+traceplot(fit)
+stan_hist(fit)
+fit
+
+
+
 
 #元ネタ：この問はパレートNBDモデルを簡単にしたものだ。
 #パレートNBDモデルでは、客が買い物の度に一定の確率p（ユーザー）で「もう使わんわこのサービス」となることを勘案している。
