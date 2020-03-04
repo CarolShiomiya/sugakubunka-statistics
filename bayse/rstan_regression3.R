@@ -1,6 +1,6 @@
 ## 2.重回帰をベイズ推論してみよう
 #YはXの1次関数でモデル化できるようなデータがあるとする。<br>
-#このとき、y=ax+b+εと書ける。a,b,V[ε]を推定しよう。（εは期待値0の正規分布）
+#このとき、y=ax+b+εと書ける。a,bを推定しよう。（εは期待値0,Covのmulti正規分布）
 #前回の授業では、a,xは1つの実数であったが、今回は2次元の実数ベクトルとする。
 #また、今回はtransformed parametersブロックの使い方も学ぶ。
 
@@ -25,17 +25,21 @@ head(data)
 #インデントを気にしない言語ではあるが、可読性を高めるためちゃんとインデントしよう。
 model <- "
 data {
-vector[2] Y;
-matrix[2,2] Cov;
+  vector[2] Y;
+  matrix[2,2] Cov;
+  matrix[2,2] Cov2;
 }
 parameters { 
-vector[2] mu;
+  vector[2] mu;
+  real<lower=0> sigma2;
 }
 model { 
-Y ~ multi_normal(mu,Cov);}"
+  sigma2~ chi_square(3);
+  Y ~ multi_normal(mu,Cov+Cov2*sigma2);
+}"
 
 
-yData<-list(Y=data2,Cov=cov)
+yData<-list(Y=data2,Cov=cov,Cov2=diag(2))
 #yData<-list(N=length(y),X=x,Y=y,new_N=5,new_X=c(5,10,15,20,25))
 library(rstan)
 fit<-stan(
